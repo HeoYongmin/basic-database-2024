@@ -4,7 +4,7 @@ SELECT Email
 	 , Names
 	 , Addr
   FROM membertbl
- ORDER BY Addr DESC;
+ ORDER BY Addr DESC, Email;
 
 -- 2. 함수를 사용하여 아래와 같은 결과가 나오도록 쿼리를 작성하시오.(전채 행의 개수는 59개입니다)
 SELECT Names AS '도서명'
@@ -21,14 +21,25 @@ SELECT DISTINCT m.[Names] AS '회원명',
                 r.RentalDate AS '대여일'
   FROM membertbl AS m LEFT JOIN rentaltbl AS r
     ON m.memberIdx = r.memberIdx
- WHERE r.memberIdx IS NULL OR r.RentalDate IS NULL
- ORDER BY Levels ASC;
+ WHERE (r.memberIdx IS NULL OR r.RentalDate IS NULL)
+   AND m.Levels = 'A'
+ ORDER BY m.Names ASC;
 
 -- 4. 다음과 같은 결과가 나오도록 SQL 문을 작성하시오.
 SELECT d.Names AS '책 장르',
-       SUM(b.Price) AS '총합계금액'
+       FORMAT(SUM(b.Price), '#,#') +'원' AS '총합계금액'
   FROM divtbl AS d LEFT JOIN bookstbl AS b 
     ON d.Division = b.Division
  WHERE b.Price IS NOT NULL
 GROUP BY d.Names;
+
+-- 5. 다음과 같은 결과가 나오도록 SQL 문을 작성하시오.
+SELECT ISNULL(d.Names, '--합계--') AS '책 장르',
+       COUNT(b.Division) AS '권수',
+       FORMAT(SUM(b.Price), '#,#') +'원' AS '총합계금액'
+  FROM divtbl AS d LEFT JOIN bookstbl AS b 
+  ON d.Division = b.Division
+ WHERE b.Price IS NOT NULL
+ GROUP BY d.Names WITH ROLLUP;
+
 
